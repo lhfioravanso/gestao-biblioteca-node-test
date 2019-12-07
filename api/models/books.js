@@ -1,9 +1,14 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
-    var books = sequelize.define('books', {
+    const books = sequelize.define('books', {
         title: DataTypes.STRING,
         isbn: DataTypes.STRING,
-        category: DataTypes.STRING,
+        category_id: {
+            type: DataTypes.INTEGER, 
+            references: {
+              model: 'categories', key: 'id'
+            }
+        },
         year: DataTypes.INTEGER
     }, {});
     

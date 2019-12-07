@@ -50,7 +50,7 @@ class UserCtrl {
         }));
     }
 
-    static login(req, res) {
+    static authenticate(req, res) {
         const { email, password } = req.body;
 
         if (!email || !password) {
@@ -77,7 +77,7 @@ class UserCtrl {
             
                 return res.status(200).send({
                     success: true,
-                    message: 'Usuário logado com sucesso.',
+                    message: 'Usuário autenticado com sucesso.',
                     token: token
                 })
             } else {
