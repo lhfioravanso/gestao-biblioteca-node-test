@@ -38,11 +38,14 @@ class UserCtrl {
                 birth_date, 
                 phone_number
             })
-            .then(userData => res.status(200).send({
+            .then(userData => {
+                userData['password'] = undefined;
+                return res.status(200).send({
                     success: true,
                     message: 'Usuário adicionado com sucesso.',
                     userData
-            }))
+                })
+            })
             .catch(error => res.status(500).send({
                 success: false,
                 message: error
@@ -56,9 +59,9 @@ class UserCtrl {
 
     static update(req, res) {
 
-        const { name, birth_date, phone_number } = req.body;
+        const { name, birth_date, phone_number, password } = req.body;
 
-        if (!name & !birth_date & !phone_number) {
+        if (!name & !birth_date & !phone_number & !password) {
             return res.status(500).send({
                 success: false,
                 message: 'Nenhum dado foi informado para atualizar!'
@@ -73,13 +76,17 @@ class UserCtrl {
                 .update({
                     name,
                     birth_date,
-                    phone_number
+                    phone_number,
+                    password
                 })
-                .then(updatedUser => res.status(200).send({
+                .then(updatedUser => {
+                    updatedUser['password'] = undefined;
+                    return res.status(200).send({
                         success: true,
                         message: 'Usuário atualizado com sucesso.',
-                        updatedUser
-                }))
+                        updatedUser 
+                    })
+                })
                 .catch(error => res.status(500).send({
                     success: false,
                     message: error
@@ -141,10 +148,9 @@ class UserCtrl {
                     success: false,
                     message: 'Usuário não localizado.'
                 }) 
-            }
+            }            
 
-            if (userData.password == password) {
-
+            if (userData.validatePassword(password)) {
                 let token = AuthMiddleware.generateToken(userData.id);
             
                 return res.status(200).send({
@@ -155,7 +161,7 @@ class UserCtrl {
             } else {
                 return res.status(500).send({
                     success: false,
-                    message: 'Dados inválidos.'
+                    message: 'Senha inválida.'
                 })
             }
         }).catch(error => res.status(500).send({
