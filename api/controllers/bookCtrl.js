@@ -1,5 +1,5 @@
 import model from '../models';
-const { books } = model;
+const { books, categories } = model;
 
 class BookCtrl {
 
@@ -117,7 +117,9 @@ class BookCtrl {
     }
 
     static findAll(req, res){
-        return books.findAll()
+        return books.findAll({
+            include: [categories]
+        })
         .then(booksData => {
             if (!booksData || booksData.length <= 0){
                 return res.status(500).send({
@@ -138,7 +140,8 @@ class BookCtrl {
 
     static findById(req, res){
         return books.findOne({
-            where: { id: req.params.id }
+            where: { id: req.params.id },
+            include: [categories]
         }).then(bookData => {
             if (bookData) {
                 return res.status(200).send({

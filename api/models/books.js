@@ -11,6 +11,12 @@ module.exports = (sequelize, DataTypes) => {
         },
         year: DataTypes.INTEGER
     }, {});
+
+    books.associate = (models) => {
+        books.belongsTo(models.categories, {
+          foreignKey: 'category_id'
+        });
+    };
     
     return books;
 };

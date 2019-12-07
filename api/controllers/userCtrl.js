@@ -34,7 +34,7 @@ class UserCtrl {
                 age, 
                 phone_number
             })
-            .then(userData => res.status(201).send({
+            .then(userData => res.status(200).send({
                     success: true,
                     message: 'Usuário adicionado com sucesso.',
                     userData

@@ -1,6 +1,7 @@
 import UserCtrl from '../controllers/userCtrl';
 import AuthMiddleware from '../auth/authMiddleware';
 import BookCtrl from '../controllers/bookCtrl';
+import FavBookCtrl from '../controllers/favBookCtrl';
 
 export default (app) => {
 
@@ -10,12 +11,14 @@ export default (app) => {
 
     //TODO: incluir validação token (AuthMiddleware) nas rotas necessarias 
 
-    app.post('/api/users/', UserCtrl.add);
+    app.post('/api/users', UserCtrl.add);
     app.post('/api/users/authenticate', UserCtrl.authenticate);
 
-    app.post('/api/books/', BookCtrl.add);
+    app.post('/api/books', BookCtrl.add);
     app.put('/api/books/:id', BookCtrl.update);
     app.delete('/api/books/:id', BookCtrl.delete);
-    app.get('/api/books/', BookCtrl.findAll);
+    app.get('/api/books', BookCtrl.findAll);
     app.get('/api/books/:id', BookCtrl.findById);
+
+    app.post('/api/favorites', FavBookCtrl.add);
 };
