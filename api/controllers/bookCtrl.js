@@ -1,5 +1,8 @@
 import model from '../models';
+
 const { books, categories } = model;
+const attrs_book = ['id', 'title', 'isbn', 'year'];
+const attrs_category = ['id', 'name'];
 
 class BookCtrl {
 
@@ -69,10 +72,10 @@ class BookCtrl {
                     category_id,
                     year
                 })
-                .then(bookUpdated => res.status(200).send({
+                .then(updatedBook => res.status(200).send({
                         success: true,
                         message: 'Livro atualizado com sucesso.',
-                        bookUpdated
+                        updatedBook
                 }))
                 .catch(error => res.status(500).send({
                     success: false,
@@ -118,7 +121,10 @@ class BookCtrl {
 
     static findAll(req, res){
         return books.findAll({
-            include: [categories]
+            attributes: attrs_book,
+            include: [
+                { model: categories, attributes: attrs_category}
+            ]
         })
         .then(booksData => {
             if (!booksData || booksData.length <= 0){
@@ -141,7 +147,10 @@ class BookCtrl {
     static findById(req, res){
         return books.findOne({
             where: { id: req.params.id },
-            include: [categories]
+            attributes: attrs_book,
+            include: [
+                { model: categories, attributes: attrs_category}
+            ]
         }).then(bookData => {
             if (bookData) {
                 return res.status(200).send({

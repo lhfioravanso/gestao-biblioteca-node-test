@@ -12,7 +12,11 @@ export default (app) => {
     //TODO: incluir validação token (AuthMiddleware) nas rotas necessarias 
 
     app.post('/api/users', UserCtrl.add);
+    app.put('/api/users/:id', UserCtrl.update);
+    app.delete('/api/users/:id', UserCtrl.delete);
     app.post('/api/users/authenticate', UserCtrl.authenticate);
+    app.get('/api/users', UserCtrl.findAll);
+    app.get('/api/users/:id', UserCtrl.findById);
 
     app.post('/api/books', BookCtrl.add);
     app.put('/api/books/:id', BookCtrl.update);
