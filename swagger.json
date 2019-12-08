@@ -1,0 +1,590 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "version": "1.0.0",
+      "title": "Bem vindo à API da Biblioteca Test!",
+      "description": "API Restfull para gestão de livros e usuários de uma biblioteca"
+    },
+    "host": "localhost:3000",
+    "basePath": "/api",
+    "tags": [
+      {
+        "name": "Authenticate",
+        "description": "API para autenticação de usuários"
+      },  
+      {
+        "name": "Users",
+        "description": "API para usuários"
+      },
+      {
+        "name": "Books",
+        "description": "API para livros"
+      },
+      {
+        "name": "Favorites",
+        "description": "API para favoritar livros"
+      },
+      {
+        "name": "Categories",
+        "description": "API para categorias de livros"
+      }
+    ],
+    "schemes": [
+      "http"
+    ],
+    "consumes": [
+      "application/json"
+    ],
+    "produces": [
+      "application/json"
+    ],
+    "paths": {
+      "/authenticate":{
+        "post": {
+            "tags": [
+              "Authenticate"
+            ],
+            "description": "Autenticar usuário",
+            "parameters": [
+              {
+                "name": "user",
+                "in": "body",
+                "description": "Dados do usuario que deseja autenticar",
+                "schema": {
+                  "$ref": "#/definitions/Auth"
+                }
+              }
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "responses": {
+              "200": {
+                "description": "Usuário autenticado com sucesso.",
+                "schema": {
+                  "$ref": "#/definitions/Token"
+                }
+              }
+            }
+          }
+      }, 
+      "/users": {
+        "post": {
+          "tags": [
+            "Users"
+          ],
+          "description": "Cadastrar usuário na biblioteca",
+          "parameters": [
+            {
+              "name": "user",
+              "in": "body",
+              "description": "Usuário que deseja criar",
+              "schema": {
+                "$ref": "#/definitions/User"
+              }
+            },
+            {
+                "name": "x-access-token",
+                "in": "header",
+                "required": "true",
+                "description": "Deve ser informado aqui o TOKEN recebido após autenticar o usuário!"
+            }
+          ],
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "200": {
+              "description": "Usuário adicionado com sucesso.",
+              "schema": {
+                "$ref": "#/definitions/User"
+              }
+            }
+          }
+        },
+        "get": {
+          "tags": [
+            "Users"
+          ],
+          "summary": "Busca todos usuários da biblioteca",
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+                "$ref": "#/definitions/Users"
+              }
+            }
+          }
+        }
+      },
+      "/users/{id}": {
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID do usuário",
+            "type": "string"
+          }
+        ],
+        "get": {
+          "tags": [
+            "Users"
+          ],
+          "summary": "Busca um usuário específico pelo ID",
+          "responses": {
+            "200": {
+              "description": "Usuário encontrado",
+              "schema": {
+                "$ref": "#/definitions/User"
+              }
+            }
+          }
+        },
+        "delete": {
+          "summary": "Excluir um usuário pelo ID",
+          "tags": [
+            "Users"
+          ],
+          "parameters": [
+            {
+                "name": "x-access-token",
+                "in": "header",
+                "required": "true",
+                "description": "Deve ser informado aqui o TOKEN recebido após autenticar o usuário!"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Usuário excluido com sucesso.",
+              "schema": {
+                "$ref": "#/definitions/User"
+              }
+            }
+          }
+        },
+        "put": {
+          "summary": "Atualizar dados de um usuário",
+          "tags": [
+            "Users"
+          ],
+          "parameters": [
+            {
+              "name": "user",
+              "in": "body",
+              "description": "Dados do usuário para atualizar",
+              "schema": {
+                "$ref": "#/definitions/UpdateUser"
+              }
+            },
+            {
+                "name": "x-access-token",
+                "in": "header",
+                "required": "true",
+                "description": "Deve ser informado aqui o TOKEN recebido após autenticar o usuário!"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Usuário atualizado com sucesso.",
+              "schema": {
+                "$ref": "#/definitions/User"
+              }
+            }
+          }
+        }
+      },
+      "/books": {
+        "post": {
+          "tags": [
+            "Books"
+          ],
+          "description": "Cadastrar livro na biblioteca",
+          "parameters": [
+            {
+              "name": "book",
+              "in": "body",
+              "description": "Livro que deseja criar",
+              "schema": {
+                "$ref": "#/definitions/Book"
+              }
+            },
+            {
+                "name": "x-access-token",
+                "in": "header",
+                "required": "true",
+                "description": "Deve ser informado aqui o TOKEN recebido após autenticar o usuário!"
+            }
+          ],
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "200": {
+              "description": "Livro adicionado com sucesso.",
+              "schema": {
+                "$ref": "#/definitions/Book"
+              }
+            }
+          }
+        },
+        "get": {
+          "tags": [
+            "Books"
+          ],
+          "summary": "Busca todos livros da biblioteca",
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+                "$ref": "#/definitions/Books"
+              }
+            }
+          }
+        }
+      },
+      "/books/{id}": {
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID do livro",
+            "type": "string"
+          }
+        ],
+        "get": {
+          "tags": [
+            "Books"
+          ],
+          "summary": "Busca um livro específico pelo ID",
+          "responses": {
+            "200": {
+              "description": "Livro encontrado",
+              "schema": {
+                "$ref": "#/definitions/Book"
+              }
+            }
+          }
+        },
+        "delete": {
+          "summary": "Excluir um livro pelo ID",
+          "tags": [
+            "Books"
+          ],
+          "parameters": [
+            {
+                "name": "x-access-token",
+                "in": "header",
+                "required": "true",
+                "description": "Deve ser informado aqui o TOKEN recebido após autenticar o usuário!"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Livro excluido com sucesso.",
+              "schema": {
+                "$ref": "#/definitions/Book"
+              }
+            }
+          }
+        },
+        "put": {
+          "summary": "Atualizar dados de um livro",
+          "tags": [
+            "Books"
+          ],
+          "parameters": [
+            {
+              "name": "book",
+              "in": "body",
+              "description": "Dados do livro para atualizar",
+              "schema": {
+                "$ref": "#/definitions/Book"
+              }
+            },
+            {
+                "name": "x-access-token",
+                "in": "header",
+                "required": "true",
+                "description": "Deve ser informado aqui o TOKEN recebido após autenticar o usuário!"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Livro atualizado com sucesso.",
+              "schema": {
+                "$ref": "#/definitions/Book"
+              }
+            }
+          }
+        }
+      },
+      "/favorites": {
+        "post": {
+          "tags": [
+            "Favorites"
+          ],
+          "description": "Favoritar livro",
+          "parameters": [
+            {
+              "name": "favorite_book",
+              "in": "body",
+              "description": "Livro que deseja favoritar",
+              "schema": {
+                "$ref": "#/definitions/FavoriteBook"
+              }
+            },
+            {
+                "name": "x-access-token",
+                "in": "header",
+                "required": "true",
+                "description": "Deve ser informado aqui o TOKEN recebido após autenticar o usuário!"
+            }
+          ],
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "200": {
+              "description": "Livro favoritado com sucesso.",
+              "schema": {
+                "$ref": "#/definitions/FavoriteBook"
+              }
+            }
+          }
+        }
+      },
+      "/categories": {
+        "post": {
+          "tags": [
+            "Categories"
+          ],
+          "description": "Cadastrar categoria na biblioteca",
+          "parameters": [
+            {
+              "name": "category",
+              "in": "body",
+              "description": "Categoria que deseja criar",
+              "schema": {
+                "$ref": "#/definitions/Category"
+              }
+            },
+            {
+                "name": "x-access-token",
+                "in": "header",
+                "required": "true",
+                "description": "Deve ser informado aqui o TOKEN recebido após autenticar o usuário!"
+            }
+          ],
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "200": {
+              "description": "Categoria adicionada com sucesso.",
+              "schema": {
+                "$ref": "#/definitions/Category"
+              }
+            }
+          }
+        },
+        "get": {
+          "tags": [
+            "Categories"
+          ],
+          "summary": "Busca todas categorias da biblioteca",
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+                "$ref": "#/definitions/Categories"
+              }
+            }
+          }
+        }
+      },
+      "/categories/{id}": {
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID da Categoria",
+            "type": "string"
+          }
+        ],
+        "get": {
+          "tags": [
+            "Categories"
+          ],
+          "summary": "Busca uma categoria específica pelo ID",
+          "responses": {
+            "200": {
+              "description": "Categoria encontrada",
+              "schema": {
+                "$ref": "#/definitions/Category"
+              }
+            }
+          }
+        },
+        "delete": {
+          "summary": "Excluir uma categoria pelo ID",
+          "tags": [
+            "Categories"
+          ],
+          "parameters": [
+            {
+                "name": "x-access-token",
+                "in": "header",
+                "required": "true",
+                "description": "Deve ser informado aqui o TOKEN recebido após autenticar o usuário!"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Categoria excluida com sucesso.",
+              "schema": {
+                "$ref": "#/definitions/Category"
+              }
+            }
+          }
+        }
+      }
+    },
+    "definitions": {
+        "Auth": {
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+       },
+       "Token": {
+        "properties": {
+            "token": {
+                "type": "string",
+                "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNTc1ODI4OTE4LCJleHAiOjE1NzU4MzA3MTh9.LymJEmv8OGdnCb-Hs7qzVr9ZYuXjrIhNiySnThT_GvQ"
+            }
+        }
+      },
+      "User": {
+        "required": [
+          "email",
+          "name",
+          "password",
+          "birth_date",
+          "phone_number"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "uniqueItems": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "birth_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "phone_number": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateUser": {
+        "required": [
+          "name",
+          "password",
+          "birth_date",
+          "phone_number"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "birth_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "phone_number": {
+            "type": "string"
+          }
+        }
+      },
+      "Users": {
+        "type": "array",
+        "$ref": "#/definitions/User"
+      },
+      "Book": {
+        "required": [
+          "title",
+          "isbn",
+          "category_id",
+          "year"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "isbn": {
+            "type": "string",
+            "uniqueItems": true
+          },
+          "category_id": {
+            "type": "integer"
+          },
+          "year": {
+            "type": "integer"
+          }
+        }
+      },
+      "Books": {
+        "type": "array",
+        "$ref": "#/definitions/Book"
+      },
+      "Category": {
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "uniqueItems": true
+          }
+        }
+      },
+      "Categories": {
+        "type": "array",
+        "$ref": "#/definitions/Category"
+      },
+      "FavoriteBook": {
+        "required": [
+          "user_id",
+          "book_id"
+        ],
+        "properties": {
+          "user_id": {
+            "type": "integer"
+          },
+          "book_id": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }

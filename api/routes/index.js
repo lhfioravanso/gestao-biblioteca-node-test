@@ -3,6 +3,10 @@ import AuthMiddleware from '../auth/authMiddleware';
 import BookCtrl from '../controllers/bookCtrl';
 import FavBookCtrl from '../controllers/favBookCtrl';
 import CategoriesCtrl from '../controllers/categoriesCtrl';
+import AuthCtrl from '../controllers/authCtrl';
+
+let swaggerUi = require('swagger-ui-express'),
+    swaggerDocument = require('../../swagger.json');
 
 export default (app) => {
 
@@ -10,7 +14,9 @@ export default (app) => {
         message: 'Bem vindo à API da Biblioteca Test!'
     }));
 
-    app.post('/api/users/authenticate', UserCtrl.authenticate);
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+    app.post('/api/authenticate', AuthCtrl.authenticate);
 
     app.get('/api/users', UserCtrl.findAll);
     app.get('/api/users/:id', UserCtrl.findById);
