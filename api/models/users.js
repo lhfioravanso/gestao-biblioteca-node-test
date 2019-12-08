@@ -4,11 +4,38 @@ const bcrypt = require('bcrypt');
 
 module.exports = (sequelize, DataTypes) => {
     const users = sequelize.define('users', {
-        email: DataTypes.STRING,
-        name: DataTypes.STRING,
-        password: DataTypes.STRING,
-        birth_date: DataTypes.DATE,
-        phone_number: DataTypes.STRING
+        email: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                isEmail: true
+            }
+        },
+        name: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        password: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                minChars: (value) => {
+                    if(value.length < 6)
+                        throw new Error('Senha deve possuir pelo menos 6 caracteres.');
+                }
+            }
+        },
+        birth_date: {
+            type: DataTypes.DATE,
+            allowNull: false
+        },
+        phone_number: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                isNumeric: true
+            }
+        }
     }, {});
 
     users.beforeSave((user, options) => {

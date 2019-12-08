@@ -2,7 +2,13 @@
 module.exports = (sequelize, DataTypes) => {
     const books = sequelize.define('books', {
         title: DataTypes.STRING,
-        isbn: DataTypes.STRING,
+        isbn: {
+          type: DataTypes.STRING,
+          allowNull: false,
+          validate: {
+              isNumeric: true
+          }
+        },
         category_id: {
             type: DataTypes.INTEGER, 
             references: {
