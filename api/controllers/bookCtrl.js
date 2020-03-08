@@ -1,5 +1,5 @@
 import model from '../models';
-
+const { validationResult } = require('express-validator/check');
 const { books, categories } = model;
 const attrs_book = ['id', 'title', 'isbn', 'year'];
 const attrs_category = ['id', 'name'];
@@ -7,21 +7,21 @@ const attrs_category = ['id', 'name'];
 class BookCtrl {
 
     static add(req, res) {
+        
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
+
         const { title, isbn, category_id, year } = req.body;
 
-        if (!title || !isbn || !category_id || !year) {
-            return res.status(500).send({
-                success: false,
-                message: 'Parametros não informados!'
-            })
-        }
 
         books.findOne({
             where: {isbn: isbn}
         }).then(bookData => {
 
             if(bookData){
-                return res.status(500).send({
+                return res.status(200).send({
                     success: false,
                     message: 'Já existe um livro com o ISBN ('+ bookData.isbn +') cadastrado!'
                 }) 
@@ -34,7 +34,7 @@ class BookCtrl {
                 category_id,
                 year
             })
-            .then(bookData => res.status(200).send({
+            .then(bookData => res.status(201).send({
                     success: true,
                     message: 'Livro adicionado com sucesso.',
                     bookData
@@ -54,11 +54,9 @@ class BookCtrl {
 
         const { title, isbn, category_id, year } = req.body;
 
-        if (!title & !isbn & !category_id & !year) {
-            return res.status(500).send({
-                success: false,
-                message: 'Nenhum dado foi informado para atualizar!'
-            })
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
         }
 
         books.findOne({
@@ -128,7 +126,7 @@ class BookCtrl {
         })
         .then(booksData => {
             if (!booksData || booksData.length <= 0){
-                return res.status(500).send({
+                return res.status(200).send({
                     success: false,
                     message: 'Nenhum livro encontrado.'
                 })
@@ -158,7 +156,7 @@ class BookCtrl {
                     bookData
                 })
             } else {
-                return res.status(500).send({
+                return res.status(200).send({
                     success: false,
                     message: 'Livro não encontrado!'
                 })

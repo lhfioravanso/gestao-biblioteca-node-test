@@ -1,5 +1,6 @@
+import AuthMiddleware from '../middlewares/auth';
+import ValidatorMiddleware from '../middlewares/validator';
 import UserCtrl from '../controllers/userCtrl';
-import AuthMiddleware from '../auth/authMiddleware';
 import BookCtrl from '../controllers/bookCtrl';
 import FavBookCtrl from '../controllers/favBookCtrl';
 import CategoriesCtrl from '../controllers/categoriesCtrl';
@@ -26,8 +27,8 @@ export default (app) => {
     
     app.get('/api/books', BookCtrl.findAll);
     app.get('/api/books/:id', BookCtrl.findById);
-    app.post('/api/books', AuthMiddleware.validateToken, BookCtrl.add);
-    app.put('/api/books/:id', AuthMiddleware.validateToken, BookCtrl.update);
+    app.post('/api/books', ValidatorMiddleware.createBook, AuthMiddleware.validateToken, BookCtrl.add);
+    app.put('/api/books/:id', ValidatorMiddleware.updateBook, AuthMiddleware.validateToken, BookCtrl.update);
     app.delete('/api/books/:id', AuthMiddleware.validateToken, BookCtrl.delete);
     
     app.post('/api/favorites', AuthMiddleware.validateToken, FavBookCtrl.add);

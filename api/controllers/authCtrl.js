@@ -1,5 +1,5 @@
 import model from '../models';
-import AuthMiddleware from '../auth/authMiddleware';
+import AuthMiddleware from '../middlewares/auth';
 
 const { users } = model;
 
