@@ -1,159 +1,114 @@
-import model from '../models';
-const { validationResult } = require('express-validator/check');
-const { books, categories } = model;
-const attrs_book = ['id', 'title', 'isbn', 'year'];
-const attrs_category = ['id', 'name'];
+import BookService from '../services/bookService'
 
 class BookCtrl {
 
-    static add(req, res) {
+    static async add(req, res) {
         
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(422).json({ errors: errors.array() });
-        }
+        const bookDTO = req.body;
 
-        const { title, isbn, category_id, year } = req.body;
+        try {
 
-
-        books.findOne({
-            where: {isbn: isbn}
-        }).then(bookData => {
-
-            if(bookData){
+            let bookAlreadyExists = await BookService.findByIsbn(bookDTO.isbn);
+            if(bookAlreadyExists){
                 return res.status(200).send({
                     success: false,
-                    message: 'Já existe um livro com o ISBN ('+ bookData.isbn +') cadastrado!'
+                    message: 'Já existe um livro com o ISBN ('+ bookDTO.isbn +') cadastrado!'
                 }) 
             }
 
-            return books
-            .create({
-                title,
-                isbn,
-                category_id,
-                year
+            let book = await BookService.addBook(bookDTO);
+            return res.status(201).send({
+                success: true,
+                message: 'Livro adicionado com sucesso.',
+                book
             })
-            .then(bookData => res.status(201).send({
-                    success: true,
-                    message: 'Livro adicionado com sucesso.',
-                    bookData
-            }))
-            .catch(error => res.status(500).send({
+        } catch (err) {
+            return res.status(500).send({
                 success: false,
-                message: error
-            }))
-
-        }).catch(error => res.status(500).send({
-            success: false,
-            message: error
-        }));
+                message: err
+            })
+        }
     }
 
-    static update(req, res) {
+    static async update(req, res) {
 
-        const { title, isbn, category_id, year } = req.body;
+        const bookDTO = req.body;
 
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(422).json({ errors: errors.array() });
-        }
-
-        books.findOne({
-            where: { id: req.params.id }
-        }).then(bookData => {
-            if(bookData) {
-                return bookData
-                .update({
-                    title,
-                    isbn,
-                    category_id,
-                    year
-                })
-                .then(updatedBook => res.status(200).send({
-                        success: true,
-                        message: 'Livro atualizado com sucesso.',
-                        updatedBook
-                }))
-                .catch(error => res.status(500).send({
-                    success: false,
-                    message: error
-                }))
+        try {
+            let bookExists = await BookService.findById(req.params.id);
+            if (bookExists) {
+                let updatedBook = await BookService.updateBook(bookExists, bookDTO);
+                return res.status(200).send({
+                    success: true,
+                    message: 'Livro atualizado com sucesso.',
+                    updatedBook
+                }) 
             } else {
                 return res.status(500).send({
                     success: false,
                     message: 'Livro não encontrado!'
                 })
             }
-        }).catch(error => res.status(500).send({
-            success: false,
-            message: error
-        }));
+        } catch (err) {
+            return res.status(500).send({
+                success: false,
+                message: err
+            })
+        }
     }
 
-    static delete(req, res) {
-        books.findOne({
-            where: { id: req.params.id }
-        }).then(bookData => {
-            if(bookData) {
-                return bookData.destroy()
-                .then(res.status(200).send({
+    static async delete(req, res) {
+        try {
+            let bookExists = await BookService.findById(req.params.id);
+            if (bookExists) {
+                await BookService.deleteBook(bookExists);
+                return res.status(200).send({
                     success: true,
                     message: 'Livro excluido com sucesso.'
-                }))
-                .catch(error => res.status(500).send({
-                    success: false,
-                    message: error
-                }))
+                }) 
             } else {
                 return res.status(500).send({
                     success: false,
                     message: 'Livro não encontrado!'
                 })
             }
-        }).catch(error => res.status(500).send({
-            success: false,
-            message: error
-        }));
+        } catch (err) {
+            return res.status(500).send({
+                success: false,
+                message: err
+            })
+        }
     }
 
-    static findAll(req, res){
-        return books.findAll({
-            attributes: attrs_book,
-            include: [
-                { model: categories, attributes: attrs_category}
-            ]
-        })
-        .then(booksData => {
-            if (!booksData || booksData.length <= 0){
+    static async findAll(req, res){
+        try {
+            let books = await BookService.findAll();
+            if (books) {
+                return res.status(200).send({
+                    success: true,
+                    books: books
+                })
+            } else {
                 return res.status(200).send({
                     success: false,
                     message: 'Nenhum livro encontrado.'
                 })
-            } else {
-                return res.status(200).send({
-                    success: true,
-                    books: booksData
-                })
             }
-        }).catch(error => res.status(500).send({
-            success: false,
-            message: error
-        }));
+        } catch (err) {
+            return res.status(500).send({
+                success: false,
+                message: err
+            })
+        }
     }
 
-    static findById(req, res){
-        return books.findOne({
-            where: { id: req.params.id },
-            attributes: attrs_book,
-            include: [
-                { model: categories, attributes: attrs_category}
-            ]
-        }).then(bookData => {
-            if (bookData) {
+    static async findById(req, res){
+        try {
+            let bookExists = await BookService.findById(req.params.id);
+            if (bookExists) {
                 return res.status(200).send({
                     success: true,
-                    bookData
+                    book: bookExists
                 })
             } else {
                 return res.status(200).send({
@@ -161,10 +116,12 @@ class BookCtrl {
                     message: 'Livro não encontrado!'
                 })
             }
-        }).catch(error => res.status(500).send({
-            success: false,
-            message: error
-        }));
+        } catch (err) {
+            return res.status(500).send({
+                success: false,
+                message: err
+            })
+        }
     }
 }
 
