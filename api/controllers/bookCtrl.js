@@ -5,7 +5,7 @@ class BookCtrl {
 
     static async add(req, res) {
         
-        const bookDTO = { title, isbn, category_id, year } = req.body;
+        const bookDTO = req.body;
 
         try {
 
@@ -33,7 +33,7 @@ class BookCtrl {
 
     static async update(req, res) {
 
-        const bookDTO = { title, isbn, category_id, year } = req.body;
+        const bookDTO = req.body;
 
         try {
             let bookExists = await BookService.getBookById(req.params.id);

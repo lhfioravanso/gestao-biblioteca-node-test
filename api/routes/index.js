@@ -2,7 +2,7 @@ import AuthMiddleware from '../middlewares/auth';
 import ValidatorMiddleware from '../middlewares/validator';
 import UserCtrl from '../controllers/userCtrl';
 import BookCtrl from '../controllers/bookCtrl';
-import FavBookCtrl from '../controllers/favBookCtrl';
+import FavoriteBookCtrl from '../controllers/favoriteBookCtrl';
 import CategoriesCtrl from '../controllers/categoriesCtrl';
 import AuthCtrl from '../controllers/authCtrl';
 
@@ -17,11 +17,11 @@ export default (app) => {
 
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-    app.post('/api/authenticate', AuthCtrl.authenticate);
+    app.post('/api/authenticate', ValidatorMiddleware.authenticateValidation(), ValidatorMiddleware.validate, AuthCtrl.authenticate);
 
     app.get('/api/users', UserCtrl.findAll);
     app.get('/api/users/:id', UserCtrl.findById);
-    app.post('/api/users', ValidatorMiddleware.createCategoryValidation(), ValidatorMiddleware.validate, AuthMiddleware.validateToken, UserCtrl.add);
+    app.post('/api/users', ValidatorMiddleware.createUserValidation(), ValidatorMiddleware.validate, AuthMiddleware.validateToken, UserCtrl.add);
     app.put('/api/users/:id', ValidatorMiddleware.updateUserValidation(), ValidatorMiddleware.validate, AuthMiddleware.validateToken, UserCtrl.update);
     app.delete('/api/users/:id', AuthMiddleware.validateToken, UserCtrl.delete);
     
@@ -31,7 +31,7 @@ export default (app) => {
     app.put('/api/books/:id', ValidatorMiddleware.updateBookValidation(), ValidatorMiddleware.validate, AuthMiddleware.validateToken, BookCtrl.update);
     app.delete('/api/books/:id', AuthMiddleware.validateToken, BookCtrl.delete);
     
-    app.post('/api/favorites', AuthMiddleware.validateToken, FavBookCtrl.add);
+    app.post('/api/favorites', ValidatorMiddleware.favoriteBookValidation(), ValidatorMiddleware.validate, AuthMiddleware.validateToken, FavoriteBookCtrl.add);
 
     app.get('/api/categories', CategoriesCtrl.findAll);
     app.get('/api/categories/:id', CategoriesCtrl.findById);

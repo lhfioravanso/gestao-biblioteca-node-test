@@ -3,14 +3,9 @@ import Constants from '../utils/constants'
 
 class UserCtrl {
 
-    cleanPasswordOfResponse (user) {
-        user['password'] = undefined;
-        return user;
-    }
-
     static async add(req, res) {
         
-        const userDTO = { email, name, password, birth_date, phone_number } = req.body;
+        const userDTO = req.body;
 
         try {
 
@@ -24,6 +19,7 @@ class UserCtrl {
 
             let user = await UserService.addUser(userDTO);
             user['password'] = undefined;
+
             return res.status(201).send({
                 success: true,
                 message: Constants.USER_SUCESSFULLY_ADDED,
@@ -39,13 +35,14 @@ class UserCtrl {
 
     static async update(req, res) {
 
-        const userDTO = { name, password, birth_date, phone_number } = req.body;
+        const userDTO = req.body;
 
         try {
             let userExists = await UserService.getUserById(req.params.id);
             if (userExists) {
                 let updatedUser = await UserService.updateUser(userExists, userDTO);
                 updatedUser['password'] = undefined;
+                
                 return res.status(200).send({
                     success: true,
                     message: Constants.USER_SUCCESSFULLY_UPDATED,

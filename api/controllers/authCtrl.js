@@ -1,49 +1,41 @@
-import model from '../models';
 import AuthMiddleware from '../middlewares/auth';
-
-const { users } = model;
+import UserService from '../services/userService';
+import Constants from '../utils/constants'
 
 class AuthCtrl {
 
-    static authenticate(req, res) {
+    static async authenticate(req, res) {
         const { email, password } = req.body;
 
-        if (!email || !password) {
-            return res.status(500).send({
-                success: false,
-                message: 'Parametros não informados!'
-            })
-        }
-
-        users.findOne({
-            where: {email: email}
-        }).then(userData => {
-
-            if(!userData){
-                return res.status(500).send({
-                    success: false,
-                    message: 'Usuário não localizado.'
-                }) 
-            }            
-
-            if (userData.validatePassword(password)) {
-                let token = AuthMiddleware.generateToken(userData.id);
-            
-                return res.status(200).send({
-                    success: true,
-                    message: 'Usuário autenticado com sucesso.',
-                    token: token
-                })
+        try {
+            let userExists = await UserService.getUserByEmail(email);
+            if (userExists) {
+                if (userExists.validatePassword(password)) {
+                    let token = AuthMiddleware.generateToken(userExists.id);
+                
+                    return res.status(200).send({
+                        success: true,
+                        message: Constants.USER_SUCCESSFULLY_AUTHENTICATED,
+                        token: token
+                    })
+                } else {
+                    return res.status(500).send({
+                        success: false,
+                        message: Constants.INVALID_CREDENTIALS
+                    })
+                }
             } else {
                 return res.status(500).send({
                     success: false,
-                    message: 'Senha inválida.'
+                    message: Constants.USER_NOT_FOUND
                 })
             }
-        }).catch(error => res.status(500).send({
-            success: false,
-            message: error
-        }));
+        } catch (err) {
+            return res.status(500).send({
+                success: false,
+                message: err
+            })
+        }
     }
     
 }

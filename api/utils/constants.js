@@ -19,4 +19,11 @@ module.exports = {
     CATEGORY_SUCCESSFULLY_DELETED : 'Categoria excluida com sucesso.',
     CATEGORY_NOT_FOUND : 'Categoria não encontrada.',
     NO_CATEGORY_FOUND : 'Nenhum categoria encontrada.',
+
+    FAVORITE_ALREADY_EXISTS : 'Este livro já está favoritado para o usuário informado.',
+    FAVORITE_SUCESSFULLY_ADDED : 'Livro favoritado com sucesso.',
+
+    USER_SUCCESSFULLY_AUTHENTICATED : 'Usuário autenticado com sucesso.',
+    INVALID_CREDENTIALS : 'E-mail ou senha inválidos.',
+
 }

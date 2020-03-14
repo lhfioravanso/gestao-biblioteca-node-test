@@ -9,6 +9,8 @@ API Restfull para gestão de livros e usuários de uma biblioteca
 - Sequelize
 - PostgreSQL
 - Swagger UI
+- Mocha
+- Chai
 
 ## Configuração Banco de Dados
 

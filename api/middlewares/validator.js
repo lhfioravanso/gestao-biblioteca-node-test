@@ -9,7 +9,7 @@ const validate = (req, res, next) => {
   return res.status(422).json(errors.array())
 }
 
-//TODO: create customValidation for 'category_id' checks if is valid category on db.
+//TODO: create customValidation for database ids.. // uniqueKeys
 
 const createBookValidation = () => {
     return [
@@ -52,6 +52,19 @@ const createCategoryValidation = () => {
   ]
 }
 
+const favoriteBookValidation = () => {
+  return [
+      check('user_id').exists(),
+      check('book_id').exists()
+  ]
+}
+
+const authenticateValidation = () => {
+  return [
+      check('email').exists(),
+      check('password').exists()
+  ]
+}
 
 
 module.exports = {
@@ -60,5 +73,7 @@ module.exports = {
   updateBookValidation,
   createCategoryValidation,
   createUserValidation,
-  updateUserValidation
+  updateUserValidation,
+  favoriteBookValidation,
+  authenticateValidation
 }

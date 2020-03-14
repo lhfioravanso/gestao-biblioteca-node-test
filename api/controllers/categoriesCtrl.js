@@ -5,7 +5,7 @@ class CategoriesCtrl {
 
     static async add(req, res) {
 
-        const categoryDTO = { name } = req.body;
+        const categoryDTO = req.body;
 
         try {
 
@@ -33,7 +33,7 @@ class CategoriesCtrl {
 
     static async update(req, res) {
 
-        const categoryDTO = { name } = req.body;
+        const categoryDTO = req.body;
 
         try {
             let categoryExists = await CategoryService.getCategoryById(req.params.id);
