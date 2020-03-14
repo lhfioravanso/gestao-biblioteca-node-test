@@ -6,7 +6,7 @@ function generateToken(userId){
         expiresIn: config.duration
     });
     return token;
-};
+}
 
 function validateToken(req, res, next) {
   var token = req.headers['x-access-token'];
@@ -15,7 +15,7 @@ function validateToken(req, res, next) {
 
   jwt.verify(token, config.secret, function(err, decoded) {
     if (err)
-    return res.status(500).send({ auth: false, message: 'Falha ao autenticar o token.' });
+      return res.status(500).send({ auth: false, message: 'Falha ao autenticar o token.' });
 
     req.userId = decoded.id;
     next();

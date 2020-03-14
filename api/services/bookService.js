@@ -1,11 +1,12 @@
 import model from '../models';
+
 const { books, categories } = model;
 const attrs_book = ['id', 'title', 'isbn', 'year'];
 const attrs_category = ['id', 'name'];
 
 class BookService {
 
-    static findAll(){
+    static getAllBooks(){
         return books.findAll({
             attributes: attrs_book,
             include: [
@@ -14,7 +15,7 @@ class BookService {
         })
     }
 
-    static findById(id){
+    static getBookById(id){
         return books.findOne({
             where: { id: id },
             attributes: attrs_book,
@@ -24,7 +25,7 @@ class BookService {
         })
     }
 
-    static findByIsbn(isbn){
+    static getBookByIsbn(isbn){
         return books.findOne({
             where: {isbn: isbn}
         })

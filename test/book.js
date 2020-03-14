@@ -20,9 +20,7 @@ describe('Books', () => {
             .get('/api/books')
             .end((err, res) => {
                   res.should.have.status(200);
-                  console.log(res.body)
-                  //res.body.should.be.a('array');
-                  //res.body.length.should.be.eql(0);
+                  res.body.books.should.be.a('array');
               done();
             });
       });

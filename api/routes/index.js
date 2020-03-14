@@ -21,8 +21,8 @@ export default (app) => {
 
     app.get('/api/users', UserCtrl.findAll);
     app.get('/api/users/:id', UserCtrl.findById);
-    app.post('/api/users', AuthMiddleware.validateToken, UserCtrl.add);
-    app.put('/api/users/:id', AuthMiddleware.validateToken, UserCtrl.update);
+    app.post('/api/users', ValidatorMiddleware.createCategoryValidation(), ValidatorMiddleware.validate, AuthMiddleware.validateToken, UserCtrl.add);
+    app.put('/api/users/:id', ValidatorMiddleware.updateUserValidation(), ValidatorMiddleware.validate, AuthMiddleware.validateToken, UserCtrl.update);
     app.delete('/api/users/:id', AuthMiddleware.validateToken, UserCtrl.delete);
     
     app.get('/api/books', BookCtrl.findAll);
@@ -35,7 +35,8 @@ export default (app) => {
 
     app.get('/api/categories', CategoriesCtrl.findAll);
     app.get('/api/categories/:id', CategoriesCtrl.findById);
-    app.post('/api/categories', AuthMiddleware.validateToken, CategoriesCtrl.add);
+    app.post('/api/categories', ValidatorMiddleware.createCategoryValidation(), ValidatorMiddleware.validate, AuthMiddleware.validateToken, CategoriesCtrl.add);
+    app.put('/api/categories/:id', ValidatorMiddleware.createCategoryValidation(), ValidatorMiddleware.validate, AuthMiddleware.validateToken, CategoriesCtrl.update);
     app.delete('/api/categories/:id', AuthMiddleware.validateToken, CategoriesCtrl.delete);
     
 };

@@ -1,115 +1,128 @@
-import model from '../models';
-
-const { categories } = model;
+import CategoryService from "../services/categoryService";
+import Constants from '../utils/constants'
 
 class CategoriesCtrl {
 
-    static add(req, res) {
-        const { name } = req.body;
+    static async add(req, res) {
 
-        if (!name) {
-            return res.status(500).send({
-                success: false,
-                message: 'Parametros não informados!'
-            })
-        }
+        const categoryDTO = { name } = req.body;
 
-        categories.findOne({
-            where: { name }
-        }).then(categoryData => {
+        try {
 
-            if(categoryData){
-                return res.status(500).send({
+            let categoryAlreadyExists = await CategoryService.getCategoryByName(categoryDTO.name);
+            if(categoryAlreadyExists){
+                return res.status(200).send({
                     success: false,
-                    message: 'Categoria existente.'
+                    message: Constants.CATEGORY_ALREADY_EXISTS
                 }) 
             }
 
-            return categories
-            .create({
-                name
+            let category = await CategoryService.addCategory(categoryDTO);
+            return res.status(201).send({
+                success: true,
+                message: Constants.CATEGORY_SUCESSFULLY_ADDED,
+                category
             })
-            .then(categoryData => res.status(200).send({
-                    success: true,
-                    message: 'Categoria adicionada com sucesso.',
-                    categoryData
-            }))
-            .catch(error => res.status(500).send({
+        } catch (err) {
+            return res.status(500).send({
                 success: false,
-                message: error
-            }))
-
-        }).catch(error => res.status(500).send({
-            success: false,
-            message: error
-        }));
+                message: err
+            })
+        }
     }
 
-    static delete(req, res) {
-        categories.findOne({
-            where: { id: req.params.id }
-        }).then(categoryData => {
-            if(categoryData) {
-                return categoryData.destroy()
-                .then(res.status(200).send({
+    static async update(req, res) {
+
+        const categoryDTO = { name } = req.body;
+
+        try {
+            let categoryExists = await CategoryService.getCategoryById(req.params.id);
+            if (categoryExists) {
+                let updatedCategory = await CategoryService.updateCategory(categoryExists, categoryDTO);
+                return res.status(200).send({
                     success: true,
-                    message: 'Categoria excluida com sucesso.'
-                }))
-                .catch(error => res.status(500).send({
-                    success: false,
-                    message: error
-                }))
+                    message: Constants.CATEGORY_SUCCESSFULLY_UPDATED,
+                    updatedCategory
+                }) 
             } else {
                 return res.status(500).send({
                     success: false,
-                    message: 'Categoria não encontrada!'
+                    message: Constants.CATEGORY_NOT_FOUND
                 })
             }
-        }).catch(error => res.status(500).send({
-            success: false,
-            message: error
-        }));
+        } catch (err) {
+            return res.status(500).send({
+                success: false,
+                message: err
+            })
+        }
     }
 
-    static findAll(req, res){
-        return categories.findAll()
-        .then(categoryData => {
-            if (!categoryData || categoryData.length <= 0){
+    static async delete(req, res) {
+        try {
+            let categoryExists = await CategoryService.getCategoryById(req.params.id);
+            if (categoryExists) {
+                await CategoryService.deleteCategory(categoryExists);
+                return res.status(200).send({
+                    success: true,
+                    message: Constants.CATEGORY_SUCCESSFULLY_DELETED
+                }) 
+            } else {
                 return res.status(500).send({
                     success: false,
-                    message: 'Nenhuma categoria encontrada.'
+                    message: Constants.CATEGORY_NOT_FOUND
+                })
+            }
+        } catch (err) {
+            return res.status(500).send({
+                success: false,
+                message: err
+            })
+        }
+    }
+
+    static async findAll(req, res){
+        try {
+            let categories = await CategoryService.getAllCategories();
+            if (categories) {
+                return res.status(200).send({
+                    success: true,
+                    categories: categories
                 })
             } else {
                 return res.status(200).send({
-                    success: true,
-                    categories: categoryData
+                    success: false,
+                    message: Constants.NO_CATEGORY_FOUND
                 })
             }
-        }).catch(error => res.status(500).send({
-            success: false,
-            message: error
-        }));
+        } catch (err) {
+            return res.status(500).send({
+                success: false,
+                message: err
+            })
+        }
     }
 
-    static findById(req, res){
-        return categories.findOne({
-            where: { id: req.params.id }
-        }).then(categoryData => {
-            if (categoryData) {
+    static async findById(req, res){
+        try {
+            let categoryExists = await CategoryService.findById(req.params.id);
+            if (categoryExists) {
                 return res.status(200).send({
                     success: true,
-                    categoryData
+                    categoryExists
                 })
             } else {
-                return res.status(500).send({
+                return res.status(200).send({
                     success: false,
-                    message: 'Categoria não encontrada!'
+                    message: Constants.CATEGORY_NOT_FOUND
                 })
             }
-        }).catch(error => res.status(500).send({
-            success: false,
-            message: error
-        }));
+        } catch (err) {
+            return res.status(500).send({
+                success: false,
+                message: err
+            })
+        }
     }
 }
 

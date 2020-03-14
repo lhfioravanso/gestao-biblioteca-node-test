@@ -1,25 +1,26 @@
 import BookService from '../services/bookService'
+import Constants from '../utils/constants'
 
 class BookCtrl {
 
     static async add(req, res) {
         
-        const bookDTO = req.body;
+        const bookDTO = { title, isbn, category_id, year } = req.body;
 
         try {
 
-            let bookAlreadyExists = await BookService.findByIsbn(bookDTO.isbn);
+            let bookAlreadyExists = await BookService.getBookByIsbn(bookDTO.isbn);
             if(bookAlreadyExists){
                 return res.status(200).send({
                     success: false,
-                    message: 'Já existe um livro com o ISBN ('+ bookDTO.isbn +') cadastrado!'
+                    message: Constants.BOOK_ALREADY_EXISTS_WITH_THE_ISBN_PROVIDED
                 }) 
             }
 
             let book = await BookService.addBook(bookDTO);
             return res.status(201).send({
                 success: true,
-                message: 'Livro adicionado com sucesso.',
+                message: Constants.BOOK_SUCESSFULLY_ADDED,
                 book
             })
         } catch (err) {
@@ -32,21 +33,21 @@ class BookCtrl {
 
     static async update(req, res) {
 
-        const bookDTO = req.body;
+        const bookDTO = { title, isbn, category_id, year } = req.body;
 
         try {
-            let bookExists = await BookService.findById(req.params.id);
+            let bookExists = await BookService.getBookById(req.params.id);
             if (bookExists) {
                 let updatedBook = await BookService.updateBook(bookExists, bookDTO);
                 return res.status(200).send({
                     success: true,
-                    message: 'Livro atualizado com sucesso.',
+                    message: Constants.BOOK_SUCCESSFULLY_UPDATED,
                     updatedBook
                 }) 
             } else {
                 return res.status(500).send({
                     success: false,
-                    message: 'Livro não encontrado!'
+                    message: Constants.BOOK_NOT_FOUND
                 })
             }
         } catch (err) {
@@ -59,17 +60,17 @@ class BookCtrl {
 
     static async delete(req, res) {
         try {
-            let bookExists = await BookService.findById(req.params.id);
+            let bookExists = await BookService.getBookById(req.params.id);
             if (bookExists) {
                 await BookService.deleteBook(bookExists);
                 return res.status(200).send({
                     success: true,
-                    message: 'Livro excluido com sucesso.'
+                    message: Constants.BOOK_SUCCESSFULLY_DELETED
                 }) 
             } else {
                 return res.status(500).send({
                     success: false,
-                    message: 'Livro não encontrado!'
+                    message: Constants.BOOK_NOT_FOUND
                 })
             }
         } catch (err) {
@@ -82,7 +83,7 @@ class BookCtrl {
 
     static async findAll(req, res){
         try {
-            let books = await BookService.findAll();
+            let books = await BookService.getAllBooks();
             if (books) {
                 return res.status(200).send({
                     success: true,
@@ -91,7 +92,7 @@ class BookCtrl {
             } else {
                 return res.status(200).send({
                     success: false,
-                    message: 'Nenhum livro encontrado.'
+                    message: Constants.NO_BOOK_FOUND
                 })
             }
         } catch (err) {
@@ -104,7 +105,7 @@ class BookCtrl {
 
     static async findById(req, res){
         try {
-            let bookExists = await BookService.findById(req.params.id);
+            let bookExists = await BookService.getBookById(req.params.id);
             if (bookExists) {
                 return res.status(200).send({
                     success: true,
@@ -113,7 +114,7 @@ class BookCtrl {
             } else {
                 return res.status(200).send({
                     success: false,
-                    message: 'Livro não encontrado!'
+                    message: Constants.BOOK_NOT_FOUND
                 })
             }
         } catch (err) {

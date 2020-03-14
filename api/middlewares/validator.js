@@ -1,5 +1,16 @@
 const { check, validationResult, oneOf } = require('express-validator/check')
 
+const validate = (req, res, next) => {
+  const errors = validationResult(req)
+  if (errors.isEmpty()) {
+    return next()
+  }  
+
+  return res.status(422).json(errors.array())
+}
+
+//TODO: create customValidation for 'category_id' checks if is valid category on db.
+
 const createBookValidation = () => {
     return [
         check('title').exists(),
@@ -17,17 +28,37 @@ const updateBookValidation = () => {
     ])
 }
 
-const validate = (req, res, next) => {
-  const errors = validationResult(req)
-  if (errors.isEmpty()) {
-    return next()
-  }  
-
-  return res.status(422).json(errors.array())
+const createUserValidation = () => {
+  return [
+      check('email').exists(),
+      check('name').exists(),
+      check('password').exists(),
+      check('birth_date').exists(),
+      check('phone_number').exists()
+  ]
+}
+const updateUserValidation = () => {
+  return oneOf([
+    check('name').exists(),
+    check('password').exists(),
+    check('birth_date').exists(),
+    check('phone_number').exists()
+  ])
 }
 
+const createCategoryValidation = () => {
+  return [
+      check('name').exists()
+  ]
+}
+
+
+
 module.exports = {
+  validate,
   createBookValidation,
   updateBookValidation,
-  validate,
+  createCategoryValidation,
+  createUserValidation,
+  updateUserValidation
 }
