@@ -50,7 +50,7 @@ describe('# Testing User Service: ', () => {
     });
 
     it('it should delete a user', async (done) => {
-        let user = await UserService.deleteUser(user_id);
+        await UserService.deleteUser(user_id);
         done();
     });
 

@@ -58,7 +58,8 @@ Dados do usuário padrão:
 
 ## Testar a API
 
-Necessário ter configurado a base de test no config.json
+Necessário ter configurado a base de test no config.json. 
+
 Execute o comando abaixo para rodar os testes: 
 
     npm test

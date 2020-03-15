@@ -45,7 +45,7 @@ describe('# Testing Category Service: ', () => {
     });
 
     it('it should delete a category', async (done) => {
-        let category = await CategoryService.deleteCategory(category_id);
+        await CategoryService.deleteCategory(category_id);
         done();
     });
 

@@ -48,7 +48,7 @@ describe('# Testing Book Service: ', () => {
     });
 
     it('it should delete a book', async (done) => {
-        let book = await BookService.deleteBook(book_id);
+        await BookService.deleteBook(book_id);
         done();
     });
 

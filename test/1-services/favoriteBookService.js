@@ -48,7 +48,7 @@ describe('# Testing FavoriteBook Service: ', () => {
     });
 
     it('it should delete a favoriteBook', async (done) => {
-        let favoriteBook = await FavoriteBookService.deleteFavorite(favoriteBook_id);
+        await FavoriteBookService.deleteFavorite(favoriteBook_id);
         done();
     });
 
