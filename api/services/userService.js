@@ -31,11 +31,13 @@ class UserService {
         return users.create(userDTO);
     }
 
-    static deleteUser(userToDelete) {
+    static async deleteUser(userId) {
+        let userToDelete = await this.getUserById(userId);
         return userToDelete.destroy();
     }
 
-    static updateUser(userToUpdate, userDTO) {
+    static async updateUser(userId, userDTO) {
+        let userToUpdate = await this.getUserById(userId);
         return userToUpdate.update(userDTO);
     }    
 }

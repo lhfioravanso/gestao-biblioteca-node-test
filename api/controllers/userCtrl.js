@@ -40,7 +40,7 @@ class UserCtrl {
         try {
             let userExists = await UserService.getUserById(req.params.id);
             if (userExists) {
-                let updatedUser = await UserService.updateUser(userExists, userDTO);
+                let updatedUser = await UserService.updateUser(userExists.id, userDTO);
                 updatedUser['password'] = undefined;
                 
                 return res.status(200).send({
@@ -66,7 +66,7 @@ class UserCtrl {
         try {
             let userExists = await UserService.getUserById(req.params.id);
             if (userExists) {
-                await UserService.deleteUser(userExists);
+                await UserService.deleteUser(userExists.id);
                 return res.status(200).send({
                     success: true,
                     message: Constants.USER_SUCCESSFULLY_DELETED

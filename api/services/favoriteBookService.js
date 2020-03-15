@@ -23,11 +23,13 @@ class FavoriteBookService {
         return favorite_books.create(favoriteBookDTO);
     }
 
-    static deleteFavorite(favoriteBookToDelete) {
+    static async deleteFavorite(favorite_id) {
+        let favoriteBookToDelete = await this.getFavoriteById(favorite_id);
         return favoriteBookToDelete.destroy();
     }
 
-    static updateFavorite(favoriteBookToUpdate, favoriteBookDTO) {
+    static async updateFavorite(favorite_id, favoriteBookDTO) {
+        let favoriteBookToUpdate = await this.getFavoriteById(favorite_id);
         return favoriteBookToUpdate.update(favoriteBookDTO);
     } 
 

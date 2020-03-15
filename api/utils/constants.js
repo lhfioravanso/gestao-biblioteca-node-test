@@ -25,5 +25,7 @@ module.exports = {
 
     USER_SUCCESSFULLY_AUTHENTICATED : 'Usuário autenticado com sucesso.',
     INVALID_CREDENTIALS : 'E-mail ou senha inválidos.',
+    TOKEN_NOT_PROVIDED : 'Token não foi informado.',
+    TOKEN_AUTHENTICATION_FAILED : 'Falha ao autenticar o token.',
 
 }

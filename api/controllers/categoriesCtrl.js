@@ -38,7 +38,7 @@ class CategoriesCtrl {
         try {
             let categoryExists = await CategoryService.getCategoryById(req.params.id);
             if (categoryExists) {
-                let updatedCategory = await CategoryService.updateCategory(categoryExists, categoryDTO);
+                let updatedCategory = await CategoryService.updateCategory(categoryExists.id, categoryDTO);
                 return res.status(200).send({
                     success: true,
                     message: Constants.CATEGORY_SUCCESSFULLY_UPDATED,
@@ -62,7 +62,7 @@ class CategoriesCtrl {
         try {
             let categoryExists = await CategoryService.getCategoryById(req.params.id);
             if (categoryExists) {
-                await CategoryService.deleteCategory(categoryExists);
+                await CategoryService.deleteCategory(categoryExists.id);
                 return res.status(200).send({
                     success: true,
                     message: Constants.CATEGORY_SUCCESSFULLY_DELETED
@@ -105,11 +105,11 @@ class CategoriesCtrl {
 
     static async findById(req, res){
         try {
-            let categoryExists = await CategoryService.findById(req.params.id);
+            let categoryExists = await CategoryService.getCategoryById(req.params.id);
             if (categoryExists) {
                 return res.status(200).send({
                     success: true,
-                    categoryExists
+                    category: categoryExists
                 })
             } else {
                 return res.status(200).send({

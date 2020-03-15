@@ -9,13 +9,11 @@ const validate = (req, res, next) => {
   return res.status(422).json(errors.array())
 }
 
-//TODO: create customValidation for database ids.. // uniqueKeys
-
 const createBookValidation = () => {
     return [
         check('title').exists(),
         check('isbn').exists(),
-        check('category_id').exists().withMessage('Id da categoria é obrigatório.'),
+        check('category_id').exists(),
         check('year').exists()
     ]
 }

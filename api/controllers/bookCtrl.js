@@ -38,7 +38,7 @@ class BookCtrl {
         try {
             let bookExists = await BookService.getBookById(req.params.id);
             if (bookExists) {
-                let updatedBook = await BookService.updateBook(bookExists, bookDTO);
+                let updatedBook = await BookService.updateBook(bookExists.id, bookDTO);
                 return res.status(200).send({
                     success: true,
                     message: Constants.BOOK_SUCCESSFULLY_UPDATED,
@@ -62,7 +62,7 @@ class BookCtrl {
         try {
             let bookExists = await BookService.getBookById(req.params.id);
             if (bookExists) {
-                await BookService.deleteBook(bookExists);
+                await BookService.deleteBook(bookExists.id);
                 return res.status(200).send({
                     success: true,
                     message: Constants.BOOK_SUCCESSFULLY_DELETED

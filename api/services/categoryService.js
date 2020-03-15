@@ -23,11 +23,13 @@ class CategoryService {
         return categories.create(categoryDTO);
     }
 
-    static deleteCategory(categoryToDelete) {
+    static async deleteCategory(category_id) {
+        let categoryToDelete = await this.getCategoryById(category_id);
         return categoryToDelete.destroy();
     }
 
-    static updateCategory(categoryToUpdate, categoryDTO) {
+    static async updateCategory(category_id, categoryDTO) {
+        let categoryToUpdate = await this.getCategoryById(category_id);
         return categoryToUpdate.update(categoryDTO);
     }    
 }

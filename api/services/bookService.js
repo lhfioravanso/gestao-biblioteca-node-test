@@ -35,11 +35,13 @@ class BookService {
         return books.create(bookDTO);
     }
 
-    static deleteBook(bookToDelete) {
+    static async deleteBook(book_id) {
+        let bookToDelete = await this.getBookById(book_id);
         return bookToDelete.destroy();
     }
 
-    static updateBook(bookToUpdate, bookDTO) {
+    static async updateBook(book_id, bookDTO) {
+        let bookToUpdate = await this.getBookById(book_id);
         return bookToUpdate.update(bookDTO);
     }    
 }

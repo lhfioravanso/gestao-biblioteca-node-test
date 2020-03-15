@@ -8,6 +8,15 @@
     "password": "postgres",
     "database": "biblioteca_dev",
     "host": "127.0.0.1",
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "logging": false
+  },
+  "test": {
+    "username": "postgres",
+    "password": "postgres",
+    "database": "biblioteca_test",
+    "host": "127.0.0.1",
+    "dialect": "postgres",
+    "logging": false
   }
 }
