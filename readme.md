@@ -9,6 +9,8 @@ API Restfull para gestão de livros e usuários de uma biblioteca
 - Sequelize
 - PostgreSQL
 - Swagger UI
+- Mocha
+- Chai
 
 ## Configuração Banco de Dados
 
@@ -16,10 +18,19 @@ API Restfull para gestão de livros e usuários de uma biblioteca
 
 Os dados de conexão do banco devem ser informados em: /api/config/config.json
 
-Script para criação da base, caso necessite:
+Script para criação da base de dev e test, caso necessite:
 
 `````javascript
 CREATE DATABASE biblioteca_dev
+    WITH 
+    OWNER = postgres
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'English_United States.1252'
+    LC_CTYPE = 'English_United States.1252'
+    TABLESPACE = pg_default
+    CONNECTION LIMIT = -1;
+
+CREATE DATABASE biblioteca_test
     WITH 
     OWNER = postgres
     ENCODING = 'UTF8'
@@ -44,6 +55,13 @@ Dados do usuário padrão:
 
     Email: admin
     Password: admin
+
+## Testar a API
+
+Necessário ter configurado a base de test no config.json
+Execute o comando abaixo para rodar os testes: 
+
+    npm test
 
 ## Acessar a API
 

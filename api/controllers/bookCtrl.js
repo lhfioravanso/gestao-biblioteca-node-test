@@ -1,172 +1,128 @@
-import model from '../models';
-
-const { books, categories } = model;
-const attrs_book = ['id', 'title', 'isbn', 'year'];
-const attrs_category = ['id', 'name'];
+import BookService from '../services/bookService'
+import Constants from '../utils/constants'
 
 class BookCtrl {
 
-    static add(req, res) {
-        const { title, isbn, category_id, year } = req.body;
+    static async add(req, res) {
+        
+        const bookDTO = req.body;
 
-        if (!title || !isbn || !category_id || !year) {
-            return res.status(500).send({
-                success: false,
-                message: 'Parametros não informados!'
-            })
-        }
+        try {
 
-        books.findOne({
-            where: {isbn: isbn}
-        }).then(bookData => {
-
-            if(bookData){
-                return res.status(500).send({
+            let bookAlreadyExists = await BookService.getBookByIsbn(bookDTO.isbn);
+            if(bookAlreadyExists){
+                return res.status(200).send({
                     success: false,
-                    message: 'Já existe um livro com o ISBN ('+ bookData.isbn +') cadastrado!'
+                    message: Constants.BOOK_ALREADY_EXISTS_WITH_THE_ISBN_PROVIDED
                 }) 
             }
 
-            return books
-            .create({
-                title,
-                isbn,
-                category_id,
-                year
+            let book = await BookService.addBook(bookDTO);
+            return res.status(201).send({
+                success: true,
+                message: Constants.BOOK_SUCESSFULLY_ADDED,
+                book
             })
-            .then(bookData => res.status(200).send({
-                    success: true,
-                    message: 'Livro adicionado com sucesso.',
-                    bookData
-            }))
-            .catch(error => res.status(500).send({
-                success: false,
-                message: error
-            }))
-
-        }).catch(error => res.status(500).send({
-            success: false,
-            message: error
-        }));
-    }
-
-    static update(req, res) {
-
-        const { title, isbn, category_id, year } = req.body;
-
-        if (!title & !isbn & !category_id & !year) {
+        } catch (err) {
             return res.status(500).send({
                 success: false,
-                message: 'Nenhum dado foi informado para atualizar!'
+                message: err
             })
         }
-
-        books.findOne({
-            where: { id: req.params.id }
-        }).then(bookData => {
-            if(bookData) {
-                return bookData
-                .update({
-                    title,
-                    isbn,
-                    category_id,
-                    year
-                })
-                .then(updatedBook => res.status(200).send({
-                        success: true,
-                        message: 'Livro atualizado com sucesso.',
-                        updatedBook
-                }))
-                .catch(error => res.status(500).send({
-                    success: false,
-                    message: error
-                }))
-            } else {
-                return res.status(500).send({
-                    success: false,
-                    message: 'Livro não encontrado!'
-                })
-            }
-        }).catch(error => res.status(500).send({
-            success: false,
-            message: error
-        }));
     }
 
-    static delete(req, res) {
-        books.findOne({
-            where: { id: req.params.id }
-        }).then(bookData => {
-            if(bookData) {
-                return bookData.destroy()
-                .then(res.status(200).send({
+    static async update(req, res) {
+
+        const bookDTO = req.body;
+
+        try {
+            let bookExists = await BookService.getBookById(req.params.id);
+            if (bookExists) {
+                let updatedBook = await BookService.updateBook(bookExists.id, bookDTO);
+                return res.status(200).send({
                     success: true,
-                    message: 'Livro excluido com sucesso.'
-                }))
-                .catch(error => res.status(500).send({
-                    success: false,
-                    message: error
-                }))
+                    message: Constants.BOOK_SUCCESSFULLY_UPDATED,
+                    updatedBook
+                }) 
             } else {
                 return res.status(500).send({
                     success: false,
-                    message: 'Livro não encontrado!'
+                    message: Constants.BOOK_NOT_FOUND
                 })
             }
-        }).catch(error => res.status(500).send({
-            success: false,
-            message: error
-        }));
+        } catch (err) {
+            return res.status(500).send({
+                success: false,
+                message: err
+            })
+        }
     }
 
-    static findAll(req, res){
-        return books.findAll({
-            attributes: attrs_book,
-            include: [
-                { model: categories, attributes: attrs_category}
-            ]
-        })
-        .then(booksData => {
-            if (!booksData || booksData.length <= 0){
+    static async delete(req, res) {
+        try {
+            let bookExists = await BookService.getBookById(req.params.id);
+            if (bookExists) {
+                await BookService.deleteBook(bookExists.id);
+                return res.status(200).send({
+                    success: true,
+                    message: Constants.BOOK_SUCCESSFULLY_DELETED
+                }) 
+            } else {
                 return res.status(500).send({
                     success: false,
-                    message: 'Nenhum livro encontrado.'
+                    message: Constants.BOOK_NOT_FOUND
+                })
+            }
+        } catch (err) {
+            return res.status(500).send({
+                success: false,
+                message: err
+            })
+        }
+    }
+
+    static async findAll(req, res){
+        try {
+            let books = await BookService.getAllBooks();
+            if (books) {
+                return res.status(200).send({
+                    success: true,
+                    books: books
                 })
             } else {
                 return res.status(200).send({
-                    success: true,
-                    books: booksData
+                    success: false,
+                    message: Constants.NO_BOOK_FOUND
                 })
             }
-        }).catch(error => res.status(500).send({
-            success: false,
-            message: error
-        }));
+        } catch (err) {
+            return res.status(500).send({
+                success: false,
+                message: err
+            })
+        }
     }
 
-    static findById(req, res){
-        return books.findOne({
-            where: { id: req.params.id },
-            attributes: attrs_book,
-            include: [
-                { model: categories, attributes: attrs_category}
-            ]
-        }).then(bookData => {
-            if (bookData) {
+    static async findById(req, res){
+        try {
+            let bookExists = await BookService.getBookById(req.params.id);
+            if (bookExists) {
                 return res.status(200).send({
                     success: true,
-                    bookData
+                    book: bookExists
                 })
             } else {
-                return res.status(500).send({
+                return res.status(200).send({
                     success: false,
-                    message: 'Livro não encontrado!'
+                    message: Constants.BOOK_NOT_FOUND
                 })
             }
-        }).catch(error => res.status(500).send({
-            success: false,
-            message: error
-        }));
+        } catch (err) {
+            return res.status(500).send({
+                success: false,
+                message: err
+            })
+        }
     }
 }
 

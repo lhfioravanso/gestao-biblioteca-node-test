@@ -1,174 +1,132 @@
-import model from '../models';
-
-const sequelize = require('sequelize');
-const { users } = model;
-const attrs = [ 'id', 'email', 'name', 'phone_number', 
-    [sequelize.fn('date_part', 'year', sequelize.fn('age', sequelize.col('birth_date'))), 'age']
-];
+import UserService from '../services/userService'
+import Constants from '../utils/constants'
 
 class UserCtrl {
 
-    static add(req, res) {
-        const { email, name, password, birth_date, phone_number } = req.body;
+    static async add(req, res) {
+        
+        const userDTO = req.body;
 
-        if (!email || !name || !password || !birth_date || !phone_number) {
-            return res.status(500).send({
-                success: false,
-                message: 'Parametros não informados!'
-            })
-        }
+        try {
 
-        users.findOne({
-            where: { email: email }
-        }).then(userData => {
-
-            if(userData){
-                return res.status(500).send({
+            let userAlreadyExists = await UserService.getUserByEmail(userDTO.email);
+            if(userAlreadyExists){
+                return res.status(200).send({
                     success: false,
-                    message: 'O e-mail informado já foi utilizado!'
+                    message: Constants.EMAIL_ALREADY_USED
                 }) 
             }
 
-            return users
-            .create({
-                email,
-                name,
-                password,
-                birth_date, 
-                phone_number
+            let user = await UserService.addUser(userDTO);
+            user['password'] = undefined;
+
+            return res.status(201).send({
+                success: true,
+                message: Constants.USER_SUCESSFULLY_ADDED,
+                user
             })
-            .then(userData => {
-                userData['password'] = undefined;
-                return res.status(200).send({
-                    success: true,
-                    message: 'Usuário adicionado com sucesso.',
-                    userData
-                })
-            })
-            .catch(error => res.status(500).send({
-                success: false,
-                message: error
-            }))
-
-        }).catch(error => res.status(500).send({
-            success: false,
-            message: error
-        }));
-    }
-
-    static update(req, res) {
-
-        const { name, birth_date, phone_number, password } = req.body;
-
-        if (!name & !birth_date & !phone_number & !password) {
+        } catch (err) {
             return res.status(500).send({
                 success: false,
-                message: 'Nenhum dado foi informado para atualizar!'
+                message: err
             })
         }
-
-        users.findOne({
-            where: { id: req.params.id }
-        }).then(userData => {
-            if(userData) {
-                return userData
-                .update({
-                    name,
-                    birth_date,
-                    phone_number,
-                    password
-                })
-                .then(updatedUser => {
-                    updatedUser['password'] = undefined;
-                    return res.status(200).send({
-                        success: true,
-                        message: 'Usuário atualizado com sucesso.',
-                        updatedUser 
-                    })
-                })
-                .catch(error => res.status(500).send({
-                    success: false,
-                    message: error
-                }))
-            } else {
-                return res.status(500).send({
-                    success: false,
-                    message: 'Usuário não encontrado!'
-                })
-            }
-        }).catch(error => res.status(500).send({
-            success: false,
-            message: error
-        }));
     }
 
-    static delete(req, res) {
-        users.findOne({
-            where: { id: req.params.id }
-        }).then(userData => {
-            if(userData) {
-                return userData.destroy()
-                .then(res.status(200).send({
+    static async update(req, res) {
+
+        const userDTO = req.body;
+
+        try {
+            let userExists = await UserService.getUserById(req.params.id);
+            if (userExists) {
+                let updatedUser = await UserService.updateUser(userExists.id, userDTO);
+                updatedUser['password'] = undefined;
+                
+                return res.status(200).send({
                     success: true,
-                    message: 'Usuário excluido com sucesso.'
-                }))
-                .catch(error => res.status(500).send({
-                    success: false,
-                    message: error
-                }))
+                    message: Constants.USER_SUCCESSFULLY_UPDATED,
+                    updatedUser
+                }) 
             } else {
                 return res.status(500).send({
                     success: false,
-                    message: 'Usuário não encontrado!'
+                    message: Constants.USER_NOT_FOUND
                 })
             }
-        }).catch(error => res.status(500).send({
-            success: false,
-            message: error
-        }));
+        } catch (err) {
+            return res.status(500).send({
+                success: false,
+                message: err
+            })
+        }
     }
 
-    static findAll(req, res){
-        return users.findAll({ 
-            attributes: attrs
-        }).then(usersData => {
-            if (!usersData || usersData.length <= 0){
+    static async delete(req, res) {
+        try {
+            let userExists = await UserService.getUserById(req.params.id);
+            if (userExists) {
+                await UserService.deleteUser(userExists.id);
+                return res.status(200).send({
+                    success: true,
+                    message: Constants.USER_SUCCESSFULLY_DELETED
+                }) 
+            } else {
                 return res.status(500).send({
                     success: false,
-                    message: 'Nenhum usuário encontrado.'
+                    message: Constants.USER_NOT_FOUND
+                })
+            }
+        } catch (err) {
+            return res.status(500).send({
+                success: false,
+                message: err
+            })
+        }
+    }
+
+    static async findAll(req, res){
+        try {
+            let users = await UserService.getAllUsers();
+            if (users) {
+                return res.status(200).send({
+                    success: true,
+                    users: users
                 })
             } else {
                 return res.status(200).send({
-                    success: true,
-                    users: usersData
+                    success: false,
+                    message: Constants.NO_USER_FOUND
                 })
             }
-        }).catch(error => res.status(500).send({
-            success: false,
-            message: error
-        }));
+        } catch (err) {
+            return res.status(500).send({
+                success: false,
+                message: err
+            })
+        }
     }
 
-    static findById(req, res){
-        return users.findOne({
-            where: { id: req.params.id },
-            attributes: attrs
-        }).then(userData => {
-            if (userData) {
+    static async findById(req, res){
+        try {
+            let userExists = await UserService.getUserById(req.params.id);
+            if (userExists) {
                 return res.status(200).send({
                     success: true,
-                    userData
+                    user: userExists
                 })
             } else {
-                return res.status(500).send({
+                return res.status(200).send({
                     success: false,
-                    message: 'Usuário não encontrado!'
+                    message: Constants.USER_NOT_FOUND
                 })
             }
-        }).catch(error => res.status(500).send({
-            success: false,
-            message: error
-        }));
+        } catch (err) {
+            return res.status(500).send({
+                success: false,
+                message: err
+            })
+        }
     }
 }
 
